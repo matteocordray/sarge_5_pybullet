@@ -8,19 +8,21 @@ p.setGravity(0,0,-10)
 planeId = p.loadURDF("plane.urdf")
 shape_id = p.createCollisionShape(
     shapeType=p.GEOM_MESH,
-    fileName="STL/Sarge_5_Body_Frame_Matteo_v1.stl",
+    fileName="OBJ/Sarge_5_Body_Frame_v1.obj",
+    meshScale=[0.25,0.25,0.25]
 )
+cubePosition = [0, 0, 0]
+cubeStartOrientation = p.getQuaternionFromEuler([1.57075,0,0])
+
 body_id = p.createMultiBody(
     baseCollisionShapeIndex=shape_id,
-    basePosition=(0, 0, 0),
-    baseOrientation=(0, 0, 0, 1),
+    basePosition=(cubePosition[0], cubePosition[1], cubePosition[2]),
+    baseOrientation=(cubeStartOrientation[0], cubeStartOrientation[1], 
+                     cubeStartOrientation[2], cubeStartOrientation[3]),
 )
-cuid = p.createCollisionShape(p.GEOM_BOX, halfExtents = [1, 1, 1])
-mass= 0 #static box
-p.createMultiBody(mass,cuid)
 
 cubeStartPos = [0,0,0.5]
-cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
+
 # boxId = p.loadURDF("URDF/04-materials.urdf",cubeStartPos, cubeStartOrientation)
 while(1):
     p.stepSimulation()

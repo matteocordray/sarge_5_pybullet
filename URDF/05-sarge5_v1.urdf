@@ -1,0 +1,349 @@
+<?xml version="1.0"?>
+<robot name="sarge5_v1">
+    
+
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+    <material name="grey">
+        <color rgba="0.1 0.1 0.1 1"/>
+    </material>
+
+    <link name="base_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_body_v2.stl" scale="0.001 0.001 0.001">
+                </mesh>
+            </geometry>
+            <material name="black">
+                
+            </material>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_body_v2.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="10"/>
+            <inertia ixx="243701175549952" ixy="57579.476562" ixz="217196675072"
+                                           iyy="468956406087680" iyz="1043384.375"
+                                                                 izz="244071129939968"
+            />
+        </inertial>
+        
+    </link>
+
+    <link name="front_left_hip">
+        <visual>
+            <origin rpy="1.57075 -0.78539816339 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <link name="front_right_hip">
+        <visual>
+            <origin rpy="1.57075 -2.35619449 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <link name="back_left_hip">
+        <visual>
+            <origin rpy="1.57075 0.78539816 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <link name="back_right_hip">
+        <visual>
+            <origin rpy="1.57075 2.35619449 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_hip.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <joint name="base_to_front_left_hip" type="revolute">
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="base_link"/>
+        <child link="front_left_hip"/>
+        <origin xyz="1.016639239 -0.24 1.016639239" rpy="0.0 0.0 0.0"/>
+    </joint>
+    <joint name="base_to_front_right_hip" type="revolute">
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="base_link"/>
+        <child link="front_right_hip"/>
+        <origin xyz="-1.016639239 -0.24 1.016639239" rpy="0.0 0.0 0.0"/>
+    </joint>
+    <joint name="base_to_back_right_hip" type="revolute">
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="base_link"/>
+        <child link="back_right_hip"/>
+        <origin xyz="-1.016639239 -0.24 -1.016639239" rpy="0.0 0.0 0.0"/>
+    </joint>
+    <joint name="base_to_back_left_hip" type="revolute">
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="base_link"/>
+        <child link="back_left_hip"/>
+        <origin xyz="1.016639239 -0.24 -1.016639239" rpy="0.0 0.0 0.0"/>
+    </joint>
+
+    <link name="front_left_knee">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="front_right_knee">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="back_right_knee">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="back_left_knee">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_knee.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <joint name="front_left_hip_to_front_left_knee" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="front_left_hip"/>
+        <child link="front_left_knee"/>
+        <origin xyz="0.6611448404 0 0.6611448404" rpy="0 -0.7853981634 0"/>
+    </joint>
+    <joint name="front_right_hip_to_front_right_knee" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="front_right_hip"/>
+        <child link="front_right_knee"/>
+        <origin xyz="-0.6611448404 0 0.6611448404" rpy="0 -2.35619449 0"/>
+    </joint>
+    <joint name="back_right_hip_to_back_right_knee" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="back_right_hip"/>
+        <child link="back_right_knee"/>
+        <origin xyz="-0.6611448404 0 -0.6611448404" rpy="0 2.35619449 0"/>
+    </joint>
+    <joint name="back_left_hip_to_back_left_knee" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="back_left_hip"/>
+        <child link="back_left_knee"/>
+        <origin xyz="0.6611448404 0 -0.6611448404" rpy="0 0.7853981634 0"/>
+    </joint>
+
+
+    <link name="front_left_foot">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="front_right_foot">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="back_right_foot">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+    <link name="back_left_foot">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="STL/sarge5_foot.stl" scale="0.01 0.01 0.01"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="3"/>
+            <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+        </inertial>
+    </link>
+
+    <joint name="front_left_knee_to_front_left_foot" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="front_left_knee"/>
+        <child link="front_left_foot"/>
+        <origin xyz="0.935 0 0" rpy="0 0 0"/>
+    </joint>
+    <joint name="front_right_knee_to_front_right_foot" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="front_right_knee"/>
+        <child link="front_right_foot"/>
+        <origin xyz="0.935 0 0" rpy="0 0 0"/>
+    </joint>
+    <joint name="back_right_knee_to_back_right_foot" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="back_right_knee"/>
+        <child link="back_right_foot"/>
+        <origin xyz="0.935 0 0" rpy="0 0 0"/>
+    </joint>
+    <joint name="back_left_knee_to_back_left_foot" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <parent link="back_left_knee"/>
+        <child link="back_left_foot"/>
+        <origin xyz="0.935 0 0" rpy="0 0 0"/>
+    </joint>
+    
+</robot>

@@ -1,39 +1,56 @@
 import pybullet as p
-import pybullet_data
-import os
 import time
-GRAVITY = -9.8
-dt = 1e-3
-iters = 2000
 import pybullet_data
 
-physicsClient = p.connect(p.GUI)
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
+
+cid = p.connect(p.SHARED_MEMORY)
+if (cid < 0):
+  cid = p.connect(p.GUI)
+
 p.resetSimulation()
-#p.setRealTimeSimulation(True)
-p.setGravity(0, 0, GRAVITY)
-p.setTimeStep(dt)
-planeId = p.loadURDF("plane.urdf")
-cubeStartPos = [0, 0, 1.13]
-cubeStartOrientation = p.getQuaternionFromEuler([0., 0, 0])
-botId = p.loadURDF("biped/biped2d_pybullet.urdf", cubeStartPos, cubeStartOrientation)
 
-#disable the default velocity motors
-#and set some position control with small force to emulate joint friction/return to a rest pose
-jointFrictionForce = 1
-for joint in range(p.getNumJoints(botId)):
-  p.setJointMotorControl2(botId, joint, p.POSITION_CONTROL, force=jointFrictionForce)
+useRealTime = 0
 
-#for i in range(10000):
-#     p.setJointMotorControl2(botId, 1, p.TORQUE_CONTROL, force=1098.0)
-#     p.stepSimulation()
-#import ipdb
-#ipdb.set_trace()
-import time
-p.setRealTimeSimulation(1)
+p.setRealTimeSimulation(useRealTime)
+
+p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
+p.setGravity(0, 0, -10)
+
+p.loadSDF("stadium.sdf")
+
+obUids = p.loadMJCF("mjcf/humanoid_fixed.xml")
+human = obUids[0]
+
+for i in range(p.getNumJoints(human)):
+  p.setJointMotorControl2(human, i, p.POSITION_CONTROL, targetPosition=0, force=500)
+
+kneeAngleTargetId = p.addUserDebugParameter("kneeAngleR", -4, 4, -1)
+maxForceId = p.addUserDebugParameter("maxForceR", 0, 500, 10)
+
+kneeAngleTargetLeftId = p.addUserDebugParameter("kneeAngleL", -4, 4, -1)
+maxForceLeftId = p.addUserDebugParameter("maxForceL", 0, 500, 10)
+
+kneeJointIndex = 11
+kneeJointIndexLeft = 18
+
 while (1):
-  p.stepSimulation()
-  p.setJointMotorControl2(botId, 1, p.TORQUE_CONTROL, force=1098.0)
-  p.setGravity(0, 0, GRAVITY)
-  time.sleep(1 / 240.)
-time.sleep(1000)
+  time.sleep(0.01)
+  kneeAngleTarget = p.readUserDebugParameter(kneeAngleTargetId)
+  maxForce = p.readUserDebugParameter(maxForceId)
+  p.setJointMotorControl2(human,
+                          kneeJointIndex,
+                          p.POSITION_CONTROL,
+                          targetPosition=kneeAngleTarget,
+                          force=maxForce)
+  kneeAngleTargetLeft = p.readUserDebugParameter(kneeAngleTargetLeftId)
+  maxForceLeft = p.readUserDebugParameter(maxForceLeftId)
+  p.setJointMotorControl2(human,
+                          kneeJointIndexLeft,
+                          p.POSITION_CONTROL,
+                          targetPosition=kneeAngleTargetLeft,
+                          force=maxForceLeft)
+
+  if (useRealTime == 0):
+    p.stepSimulation()

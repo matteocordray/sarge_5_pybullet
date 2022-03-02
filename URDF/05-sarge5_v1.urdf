@@ -15,6 +15,7 @@
     </material>
 
     <link name="base_link">
+        <static>true</static>
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
@@ -319,7 +320,7 @@
 
     <joint name="front_left_knee_to_front_left_foot" type="revolute">
         <axis xyz="0 0 1"/>
-        <limit effort="1000.0" lower="-1.57075" upper="1.57075" velocity="10"/>
+        <limit effort="1000.0" lower="-3.1415" upper="3.1415" velocity="10"/>
         <parent link="front_left_knee"/>
         <child link="front_left_foot"/>
         <origin xyz="0.935 0 0" rpy="0 0 0"/>
@@ -344,6 +345,25 @@
         <parent link="back_left_knee"/>
         <child link="back_left_foot"/>
         <origin xyz="0.935 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="front_left_end_effector">
+        <visual>
+            <geometry>
+                <sphere radius="0.1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="0.1"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="front_left_foot_to_front_left_end_effector" type="fixed">
+        <parent link="front_left_foot"/>
+        <child link="front_left_end_effector"/>
+        <origin xyz="1.02 0 0" rpy="0 0 0"/>
     </joint>
     
 </robot>

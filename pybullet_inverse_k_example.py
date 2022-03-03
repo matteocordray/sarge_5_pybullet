@@ -195,7 +195,7 @@ while 1:
 
   ls = p.getLinkState(kukaId, kukaEndEffectorIndex)
   if (hasPrevPose):
-    p.addUserDebugLine(prevPose, pos, [0, 0, 0.3], 1, trailDuration)
+    p.addUserDebugLine(prevPose, pos, [1, 0, 0], 1, trailDuration)
     p.addUserDebugLine(prevPose1, ls[4], [1, 0, 0], 1, trailDuration)
   prevPose = pos
   prevPose1 = ls[4]

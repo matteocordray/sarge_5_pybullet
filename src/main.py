@@ -9,7 +9,7 @@ import pybullet_data
 import calc.leg as l
 
 GRAVITY = -9.8
-# GRAVITY = 0
+GRAVITY = 0
 
 QB = math.pi / 4
 R0FL = 0.0
@@ -26,7 +26,7 @@ YB = 0.0
 
 # Set Legs
 FL_Leg = l.Leg(QB, R0FL, LB, L0, L1, L2, RB, PB, YB)
-FR_Leg = l.Leg(QB, R0FL, LB, L0, L1, L2, RB, PB, YB)
+FR_Leg = l.Leg((QB), R0FL, LB, L0, L1, L2, RB, PB, YB)
 BR_Leg = l.Leg(QB, R0FL, LB, L0, L1, L2, RB, PB, YB)
 BL_Leg = l.Leg(QB, R0FL, LB, L0, L1, L2, RB, PB, YB)
 
@@ -51,7 +51,7 @@ planeId = p.loadURDF("plane.urdf")
 p.resetDebugVisualizerCamera(cameraDistance=10, cameraYaw = 45, cameraPitch = -45, cameraTargetPosition=[0,0,0])
 
 cubeStartOrientation = p.getQuaternionFromEuler([1.57075,0,0])
-cubeStartPos = [0,0,2]
+cubeStartPos = [0,0,5]
 
 #Camera paramers to be able to yaw pitch and zoom the camera (Focus remains on the robot) 
 cyaw=10
@@ -64,7 +64,7 @@ sarge5EndEffectorIndex = 3
 numJoints = p.getNumJoints(sarge5_Id) - 2
 maxForce = 500
 
-commandMFB = 60
+commandMFB = 100
 step = 0
 
 # LEG POSITIONS
@@ -73,9 +73,18 @@ xb = 2.0 #starting x base position of the front left foot
 yb = 2.0 #starting y base position of the front left foot
 zb = -1.5 #starting z base position of the front left foot
 
-xs = 1.5 #stride forward & back
-ys = 1.5 #stride left & right
+xs = 1 #stride forward & back
+ys = 1 #stride left & right
 zs = 0.2 #stride up & down
+
+
+# DEBUG PARAMETERS
+
+trailDuration = 5
+
+FL_Pose = [0, 0, 0]
+FL_prevPose = [0, 0, 0]
+FL_hasPrevPose = 0
 
 """ FLxe = p.addUserDebugParameter("FLxe", 2, 3, 2)
 FLye = p.addUserDebugParameter("FLye", 2, 3, 2)
@@ -138,17 +147,17 @@ while(1):
     if keys.get(102):  #F
         cpitch-=1
     if keys.get(122):  #Z
-        cdist+=.01
+        cdist+=.1
     if keys.get(120):  #X
-        cdist-=.01
+        cdist-=.1
     
     t += 1
-    if (t % 10) == 0:
+    if (t % 50) == 0:
         if t > 3000:
             t = 0
-        print("Timer: " + str(t))
+        # print("Timer: " + str(t))
         step += 1
-        if step > 8:
+        if step > 7:
             step = 0
         # add to step counter
         # print(step)
@@ -180,13 +189,16 @@ while(1):
             
             # x movement
             FLxe = xb + ((floatMFB * xs)/4.0)
-            FRxe = xb + ((floatMFB * xs)/4.0)
+            FRxe = xb - ((floatMFB * xs)/4.0)
             BRxe = xb + ((floatMFB * xs)/4.0)
-            BLxe = xb + ((floatMFB * xs)/4.0)
+            BLxe = xb - ((floatMFB * xs)/4.0)
         elif step == 4:
             # z movement
             FRze = zb + zs
             BLze = zb + zs
+            
+            # x movement
+            FLxe = xb
         elif step == 5:
             # z movement
             FRze = zb + zs
@@ -213,16 +225,16 @@ while(1):
             FRxe = xb + ((floatMFB * xs)/4.0)
             BRxe = xb - ((floatMFB * xs)/4.0)
             BLxe = xb + ((floatMFB * xs)/4.0)
-        elif step == 8:
+        # elif step == 8:
             # z movement
-            FLze = zb + zs
-            BRze = zb + zs
+            # FLze = zb + zs
+            # BRze = zb + zs
         
         print("step: " + str(step))
-        print("FLxe: " + str(FLxe))
-        print("FRxe: " + str(FRxe))
-        print("BRxe: " + str(BRxe))
-        print("BLxe: " + str(BLxe))
+        print("FLxe: " + str(FLxe) + " FLye: " + str(FLye) + " FLze: " + str(FLze))
+        # print("FRxe: " + str(FRxe))
+        # print("BRxe: " + str(BRxe))
+        # print("BLxe: " + str(BLxe))
 
     """
     _FLxe = p.readUserDebugParameter(FLxe)
@@ -243,9 +255,9 @@ while(1):
     """
 
     FL_Leg.calcAngles(FLxe, FLye, FLze)
-    FR_Leg.calcAngles(FRxe, FRye, FRze)
-    BR_Leg.calcAngles(BRxe, BRye, BRze)
-    BL_Leg.calcAngles(BLxe, BLye, BLze)
+    # FR_Leg.calcAngles(FRxe, FRye, FRze)
+    # BR_Leg.calcAngles(BRxe, BRye, BRze)
+    # BL_Leg.calcAngles(BLxe, BLye, BLze)
     
     # pos = [_FLxe, _FLze, _FLye]
     # print(pos)
@@ -265,6 +277,15 @@ while(1):
                      BR_Leg.getQ0(), BR_Leg.getQ1(), BR_Leg.getQ2(),
                      BL_Leg.getQ0(), BL_Leg.getQ1(), BL_Leg.getQ2()]
 
+    FL_Pose = [FLye, FLze, FLxe]
+
+    # DEBUG
+    if (FL_hasPrevPose):
+        p.addUserDebugLine(FL_prevPose, FL_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+
+    FL_prevPose = FL_Pose
+    FL_hasPrevPose = 1
+    
     
     # print(jointPoses)
     ind = 0
@@ -274,10 +295,10 @@ while(1):
                                     jointIndex = i,
                                     controlMode = p.POSITION_CONTROL,
                                     targetPosition = jointPoses[ind],
-                                    targetVelocity = 0.1,
-                                    force = maxForce,
-                                    positionGain = 0.3,
-                                    velocityGain = 1)
+                                    targetVelocity = 1,
+                                    force = 1000,
+                                    positionGain = 0.1,
+                                    velocityGain = 0.1)
             ind += 1 #increment by one for jointPoses list
 
 

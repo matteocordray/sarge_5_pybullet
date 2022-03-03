@@ -14,89 +14,50 @@ cubeStartPos = [0,0,2]
 
 sarge5_Id = p.loadURDF("URDF/05-sarge5_v1.urdf",cubeStartPos, cubeStartOrientation)
 sarge5EndEffectorIndex = 3
-numJoints = p.getNumJoints(sarge5_Id)
-
-step = 0
+# numJoints = p.getNumJoints(sarge5_Id)
+numJoints = 4
 
 maxForce = 800
 
-commandMFB = 60 # value between -127 and 127
+FLxe = p.addUserDebugParameter("FLxe", -7, 7, -3.5)
+FLye = p.addUserDebugParameter("FLye", -7, 7, 3.5)
+FLze = p.addUserDebugParameter("FLze", -7, 7, 3.5)
 
-# LEG POSITIONS
+for i in range(p.getNumJoints(sarge5_Id)):
+  p.setJointMotorControl2(sarge5_Id, i, p.POSITION_CONTROL, targetPosition=0, force=maxForce)
 
-xb = 2.76907 #starting x base position of the front left foot
-yb = -.8402 #starting y base position of the front left foot
-zb = 0 #starting z base position of the front left foot
-
-xs = 2.0 #stride forward & back
-ys = -2.0 #stride left & right
-zs = 0.2 #stride up & down
-
-pos = [xb, yb, zb]
-orn = p.getQuaternionFromEuler([0, 0, 3.14])
-
-
-
-jointPoses = p.calculateInverseKinematics(sarge5_Id,
-                                          sarge5EndEffectorIndex,
-                                          pos)
-
-for i in range(numJoints - 1):
-    p.setJointMotorControl2(sarge5_Id, i, p.POSITION_CONTROL, targetPosition = jointPoses[i], force=maxForce)
-
-print(p.getJointInfo(sarge5_Id, 3))
+""" THIS SECTION IS FOR LEG POSITIONS """
+def calcAngles(xe, ye, ze):
+    xm11 = _LB*cos(_QB)
 
 while(1):
     time.sleep(1./240.)
     # frontRightHipTarget = p.readUserDebugParameter(frontRightHipTargetId)
     p.stepSimulation()
-    if step > 8:
-        step = 1
-    step += 1 # add to step counter
-    # print(step)
+
+    _FLxe = p.readUserDebugParameter(FLxe)
+    _FLye = p.readUserDebugParameter(FLye)
+    _FLze = p.readUserDebugParameter(FLze)
     
-    FLxe = xb
-    FLye = yb
-    FLze = zb
-
-    floatMFB = commandMFB / 127.0
-
-    if step == 1:
-        FLze = zb + zs
-        FLxe = xb + (floatMFB * xs)
-    elif step == 2:
-        FLxe = xb + (floatMFB * xs)
-    elif step == 3:
-        FLxe = xb + (floatMFB * xs)
-    elif step == 5:
-        FLxe = xb - (floatMFB * xs)
-    elif step == 6:
-        FLxe = xb - (floatMFB * xs)
-    elif step == 7:
-        FLze = zb + zs
-        FLxe = xb - (floatMFB * xs)
-    elif step == 8:
-        FLze = zb + zs
-
     
-    pos = [FLxe, FLye, FLze]
+    pos = [_FLxe, _FLze, _FLye]
     # print(pos)
     orn = p.getQuaternionFromEuler([0, 0, 3.14])
 
-    """ jointPoses = p.calculateInverseKinematics(sarge5_Id,
+    jointPoses = p.calculateInverseKinematics(sarge5_Id,
                                               sarge5EndEffectorIndex,
                                               pos,
-                                              orn) """
+                                              orn)
     
-    """ for i in range(numJoints):
+    for i in range(numJoints - 1):
         p.setJointMotorControl2(bodyIndex = sarge5_Id,
                                 jointIndex = i,
                                 controlMode = p.POSITION_CONTROL,
                                 targetPosition = jointPoses[i],
                                 targetVelocity = 0,
                                 force = maxForce,
-                                positionGain = 1,
-                                velocityGain = 1) """
+                                positionGain = 0.3,
+                                velocityGain = 1)
 
 
     

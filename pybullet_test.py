@@ -72,7 +72,7 @@ while(1):
         FLze = zb + zs
 
     
-    pos = [FLxe, FLye, FLze]
+    pos = [FLxe, FLze, FLye]
     print(pos)
     orn = p.getQuaternionFromEuler([0, 0, 3.14])
 

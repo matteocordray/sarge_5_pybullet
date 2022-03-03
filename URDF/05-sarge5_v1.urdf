@@ -357,6 +357,7 @@
             <geometry>
                 <sphere radius="0.1"/>
             </geometry>
+            <contact_coefficient mu="0.4"/>
         </collision>
         <inertial>
             <mass value="3"/>
@@ -373,6 +374,7 @@
             <geometry>
                 <sphere radius="0.1"/>
             </geometry>
+            <contact_coefficient mu="1"/>
         </collision>
         <inertial>
             <mass value="3"/>
@@ -389,6 +391,7 @@
             <geometry>
                 <sphere radius="0.1"/>
             </geometry>
+            <contact_coefficient mu="1"/>
         </collision>
         <inertial>
             <mass value="3"/>
@@ -405,6 +408,7 @@
             <geometry>
                 <sphere radius="0.1"/>
             </geometry>
+            <contact_coefficient mu="1"/>
         </collision>
         <inertial>
             <mass value="3"/>

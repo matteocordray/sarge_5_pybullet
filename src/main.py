@@ -9,7 +9,7 @@ import pybullet_data
 import calc.leg as l
 
 GRAVITY = -9.8
-GRAVITY = 0
+# GRAVITY = 0
 
 QB = math.pi / 4
 R0FL = 0.0
@@ -51,7 +51,7 @@ planeId = p.loadURDF("plane.urdf")
 p.resetDebugVisualizerCamera(cameraDistance=10, cameraYaw = 45, cameraPitch = -45, cameraTargetPosition=[0,0,0])
 
 cubeStartOrientation = p.getQuaternionFromEuler([1.57075,0,0])
-cubeStartPos = [0,0,5]
+cubeStartPos = [0,0,2]
 
 #Camera paramers to be able to yaw pitch and zoom the camera (Focus remains on the robot) 
 cyaw=10
@@ -59,12 +59,9 @@ cpitch=-20
 cdist=8
 
 sarge5_Id = p.loadURDF("../URDF/05-sarge5_v1.urdf",cubeStartPos, cubeStartOrientation)
-sarge5EndEffectorIndex = 3
-# numJoints = p.getNumJoints(sarge5_Id)
-numJoints = p.getNumJoints(sarge5_Id) - 2
 maxForce = 500
 
-commandMFB = 100
+commandMFB = 60
 step = 0
 
 # LEG POSITIONS
@@ -75,7 +72,7 @@ zb = -1.5 #starting z base position of the front left foot
 
 xs = 1 #stride forward & back
 ys = 1 #stride left & right
-zs = 0.2 #stride up & down
+zs = 0.3 #stride up & down
 
 
 # DEBUG PARAMETERS
@@ -85,6 +82,14 @@ trailDuration = 5
 FL_Pose = [0, 0, 0]
 FL_prevPose = [0, 0, 0]
 FL_hasPrevPose = 0
+
+FR_Pose = [0, 0, 0]
+FR_prevPose = [0, 0, 0]
+FR_hasPrevPose = 0
+
+BR_Pose = [0, 0, 0]
+BR_prevPose = [0, 0, 0]
+BR_hasPrevPose = 0
 
 """ FLxe = p.addUserDebugParameter("FLxe", 2, 3, 2)
 FLye = p.addUserDebugParameter("FLye", 2, 3, 2)
@@ -102,11 +107,18 @@ BLxe = p.addUserDebugParameter("BLxe", 2, 3, 2)
 BLye = p.addUserDebugParameter("BLye", 2, 3, 2)
 BLze = p.addUserDebugParameter("BLze", -2, 0, -1.5) """
 
+time_c = p.addUserDebugParameter("time", 1, 50, 10)
+comMFB = p.addUserDebugParameter("speed", 0, 127, 60)
+
 for i in range(p.getNumJoints(sarge5_Id)):
     if (i - 3) % 4 != 0:
         print(p.getJointInfo(sarge5_Id, i))
         p.setJointMotorControl2(sarge5_Id, i, p.POSITION_CONTROL, targetPosition=0, force=maxForce)
 
+p.changeDynamics(sarge5_Id,3,lateralFriction=2)
+p.changeDynamics(sarge5_Id,7,lateralFriction=2)
+p.changeDynamics(sarge5_Id,11,lateralFriction=2)
+p.changeDynamics(sarge5_Id,15,lateralFriction=2)
 
 t = 0
 
@@ -129,8 +141,12 @@ def setDefaultBase():
 
 setDefaultBase() # set default base values
 
+# Change general motor speed
+vvec=[12]*4
+print(vvec)
+
 while(1):
-    time.sleep(1./240.)
+    # time.sleep(1./240.)
     # frontRightHipTarget = p.readUserDebugParameter(frontRightHipTargetId)
     # p.stepSimulation()
     sargePos, sargeOrn = p.getBasePositionAndOrientation(sarge5_Id)
@@ -152,10 +168,14 @@ while(1):
         cdist-=.1
     
     t += 1
-    if (t % 50) == 0:
+    time_control = p.readUserDebugParameter(time_c)
+    if (t % time_control) == 0:
         if t > 3000:
             t = 0
         # print("Timer: " + str(t))
+        # if step == 0:
+
+        
         step += 1
         if step > 7:
             step = 0
@@ -163,8 +183,9 @@ while(1):
         # print(step)
         
         setDefaultBase()
-
-        floatMFB = commandMFB / 127.0
+        comm_MFB = p.readUserDebugParameter(comMFB)
+        # floatMFB = commandMFB / 127.0
+        floatMFB = comm_MFB / 127.0
 
         if step == 1:
             # z movement
@@ -174,14 +195,14 @@ while(1):
             # x movement
             FLxe = xb + ((floatMFB * xs)/4.0)
             FRxe = xb - ((floatMFB * xs)/4.0)
-            BRxe = xb + ((floatMFB * xs)/4.0)
-            BLxe = xb - ((floatMFB * xs)/4.0)
+            BRxe = xb - ((floatMFB * xs)/4.0)
+            BLxe = xb + ((floatMFB * xs)/4.0)
         elif step == 2:
             # x movement
             FLxe = xb + ((floatMFB * xs)/2.0)
             FRxe = xb - ((floatMFB * xs)/2.0)
-            BRxe = xb + ((floatMFB * xs)/2.0)
-            BLxe = xb - ((floatMFB * xs)/2.0)
+            BRxe = xb - ((floatMFB * xs)/2.0)
+            BLxe = xb + ((floatMFB * xs)/2.0)
         elif step == 3:
             # z movement
             FRze = zb + zs
@@ -190,8 +211,8 @@ while(1):
             # x movement
             FLxe = xb + ((floatMFB * xs)/4.0)
             FRxe = xb - ((floatMFB * xs)/4.0)
-            BRxe = xb + ((floatMFB * xs)/4.0)
-            BLxe = xb - ((floatMFB * xs)/4.0)
+            BRxe = xb - ((floatMFB * xs)/4.0)
+            BLxe = xb + ((floatMFB * xs)/4.0)
         elif step == 4:
             # z movement
             FRze = zb + zs
@@ -207,14 +228,14 @@ while(1):
             # x movement
             FLxe = xb - ((floatMFB * xs)/4.0)
             FRxe = xb + ((floatMFB * xs)/4.0)
-            BRxe = xb - ((floatMFB * xs)/4.0)
-            BLxe = xb + ((floatMFB * xs)/4.0)
+            BRxe = xb + ((floatMFB * xs)/4.0)
+            BLxe = xb - ((floatMFB * xs)/4.0)
         elif step == 6:
             # x movement
             FLxe = xb - ((floatMFB * xs)/2.0)
             FRxe = xb + ((floatMFB * xs)/2.0)
-            BRxe = xb - ((floatMFB * xs)/2.0)
-            BLxe = xb + ((floatMFB * xs)/2.0)
+            BRxe = xb + ((floatMFB * xs)/2.0)
+            BLxe = xb - ((floatMFB * xs)/2.0)
         elif step == 7:
             # z movement
             FLze = zb + zs
@@ -223,8 +244,8 @@ while(1):
             # x movement
             FLxe = xb - ((floatMFB * xs)/4.0)
             FRxe = xb + ((floatMFB * xs)/4.0)
-            BRxe = xb - ((floatMFB * xs)/4.0)
-            BLxe = xb + ((floatMFB * xs)/4.0)
+            BRxe = xb + ((floatMFB * xs)/4.0)
+            BLxe = xb - ((floatMFB * xs)/4.0)
         # elif step == 8:
             # z movement
             # FLze = zb + zs
@@ -255,9 +276,9 @@ while(1):
     """
 
     FL_Leg.calcAngles(FLxe, FLye, FLze)
-    # FR_Leg.calcAngles(FRxe, FRye, FRze)
-    # BR_Leg.calcAngles(BRxe, BRye, BRze)
-    # BL_Leg.calcAngles(BLxe, BLye, BLze)
+    FR_Leg.calcAngles(FRye, FRxe, FRze) # THIS HAS DIFFERENT COORDINATE SYSTEM
+    BR_Leg.calcAngles(BRxe, BRye, BRze)
+    BL_Leg.calcAngles(BLye, BLxe, BLze) # THIS HAS DIFFERENT COORDINATE SYSTEM
     
     # pos = [_FLxe, _FLze, _FLye]
     # print(pos)
@@ -278,27 +299,33 @@ while(1):
                      BL_Leg.getQ0(), BL_Leg.getQ1(), BL_Leg.getQ2()]
 
     FL_Pose = [FLye, FLze, FLxe]
+    FR_Pose = [-FRxe, FRze, FRye]
+    BR_Pose = [-BRxe, BRze, -BRye]
 
     # DEBUG
-    if (FL_hasPrevPose):
-        p.addUserDebugLine(FL_prevPose, FL_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+    if (FL_hasPrevPose and FR_hasPrevPose):
+        # p.addUserDebugLine(FL_prevPose, FL_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+        # p.addUserDebugLine(FR_prevPose, FR_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+        p.addUserDebugLine(BR_prevPose, BR_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
 
     FL_prevPose = FL_Pose
     FL_hasPrevPose = 1
+    FR_prevPose = FR_Pose
+    FR_hasPrevPose = 1
+    BR_prevPose = BR_Pose
+    BR_hasPrevPose = 1
     
     
     # print(jointPoses)
     ind = 0
-    for i in range(numJoints + 1): 
+    for i in range(p.getNumJoints(sarge5_Id)): 
         if (i - 3) % 4 != 0:
             p.setJointMotorControl2(bodyIndex = sarge5_Id,
                                     jointIndex = i,
                                     controlMode = p.POSITION_CONTROL,
                                     targetPosition = jointPoses[ind],
-                                    targetVelocity = 1,
-                                    force = 1000,
-                                    positionGain = 0.1,
-                                    velocityGain = 0.1)
+                                    maxVelocity = 3,
+                                    force = 1000)
             ind += 1 #increment by one for jointPoses list
 
 

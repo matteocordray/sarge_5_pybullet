@@ -61,7 +61,6 @@ cdist=8
 sarge5_Id = p.loadURDF("../URDF/05-sarge5_v1.urdf",cubeStartPos, cubeStartOrientation)
 maxForce = 500
 
-commandMFB = 60
 step = 0
 
 # LEG POSITIONS
@@ -72,7 +71,16 @@ zb = -1.5 #starting z base position of the front left foot
 
 xs = 1 #stride forward & back
 ys = 1 #stride left & right
-zs = 0.3 #stride up & down
+zs = 0.5 #stride up & down
+
+#Scenery e.g. an inclined box
+boxHalfLength = 5
+boxHalfWidth = 10
+boxHalfHeight = 0.2
+sh_colBox = p.createCollisionShape(p.GEOM_BOX,halfExtents=[boxHalfLength,boxHalfWidth,boxHalfHeight])
+box_orn = p.getQuaternionFromEuler([-0.2, 0, 0])
+block=p.createMultiBody(baseMass=0,baseCollisionShapeIndex = sh_colBox,
+                        basePosition = [0,-10,-0.1],baseOrientation = [box_orn[0], box_orn[1], box_orn[2], box_orn[3]])
 
 
 # DEBUG PARAMETERS
@@ -107,8 +115,8 @@ BLxe = p.addUserDebugParameter("BLxe", 2, 3, 2)
 BLye = p.addUserDebugParameter("BLye", 2, 3, 2)
 BLze = p.addUserDebugParameter("BLze", -2, 0, -1.5) """
 
-time_c = p.addUserDebugParameter("time", 1, 50, 10)
-comMFB = p.addUserDebugParameter("speed", 0, 127, 60)
+time_c = p.addUserDebugParameter("time", 3, 25, 4)
+comMFB = p.addUserDebugParameter("speed", 0, 127, 70)
 
 for i in range(p.getNumJoints(sarge5_Id)):
     if (i - 3) % 4 != 0:
@@ -168,7 +176,8 @@ while(1):
         cdist-=.1
     
     t += 1
-    time_control = p.readUserDebugParameter(time_c)
+    time_control = int(p.readUserDebugParameter(time_c))
+    print(time_control)
     if (t % time_control) == 0:
         if t > 3000:
             t = 0

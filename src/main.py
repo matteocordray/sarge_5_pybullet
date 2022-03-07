@@ -153,7 +153,12 @@ setDefaultBase() # set default base values
 vvec=[12]*4
 print(vvec)
 
+sarge_orn = 0
+
 while(1):
+    
+    sarge_orn = p.getEulerFromQuaternion(p.getBasePositionAndOrientation(sarge5_Id)[1])
+    print("Yaw: " + str((sarge_orn[0]*180.0)/math.pi) + "° Pitch: " + str((sarge_orn[1]*180.0)/math.pi) + "° Roll: " + str((sarge_orn[2]*180.0)/math.pi) + "°")
     # time.sleep(1./240.)
     # frontRightHipTarget = p.readUserDebugParameter(frontRightHipTargetId)
     # p.stepSimulation()
@@ -177,7 +182,7 @@ while(1):
     
     t += 1
     time_control = int(p.readUserDebugParameter(time_c))
-    print(time_control)
+    # print(time_control)
     if (t % time_control) == 0:
         if t > 3000:
             t = 0
@@ -260,8 +265,8 @@ while(1):
             # FLze = zb + zs
             # BRze = zb + zs
         
-        print("step: " + str(step))
-        print("FLxe: " + str(FLxe) + " FLye: " + str(FLye) + " FLze: " + str(FLze))
+        # print("step: " + str(step))
+        # print("FLxe: " + str(FLxe) + " FLye: " + str(FLye) + " FLze: " + str(FLze))
         # print("FRxe: " + str(FRxe))
         # print("BRxe: " + str(BRxe))
         # print("BLxe: " + str(BLxe))

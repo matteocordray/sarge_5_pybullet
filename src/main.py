@@ -49,7 +49,7 @@ cpitch=-10# -20
 cdist=8
 
 sarge5_Id = p.loadURDF("../URDF/05-sarge5_v1.urdf",cubeStartPos, cubeStartOrientation)
-maxForce = 100
+maxForce = 50
 
 step = 0
 
@@ -81,7 +81,7 @@ box_down_orn = p.getQuaternionFromEuler([0.1, 0, 0])
 block=p.createMultiBody(baseMass=0,baseCollisionShapeIndex = sh_colBox,
                         basePosition = [0,-6,-0.1],baseOrientation = [box_orn[0], box_orn[1], box_orn[2], box_orn[3]])
 block_down = p.createMultiBody(baseMass=0,baseCollisionShapeIndex = sh_colBox_down,
-                        basePosition = [0,-45.5,-0.1],baseOrientation = [box_down_orn[0], box_down_orn[1], box_down_orn[2], box_down_orn[3]])
+                        basePosition = [0,-45.6,-0.1],baseOrientation = [box_down_orn[0], box_down_orn[1], box_down_orn[2], box_down_orn[3]])
 p.changeDynamics(block, -1, lateralFriction=2)
 p.changeDynamics(block_down, -1, lateralFriction=2)
 
@@ -101,7 +101,7 @@ BR_Pose = [0, 0, 0]
 BR_prevPose = [0, 0, 0]
 BR_hasPrevPose = 0
 
-time_c = int(p.addUserDebugParameter("time", 10, 50, 25))
+time_c = int(p.addUserDebugParameter("time", 5, 20, 10))
 comMFB = p.addUserDebugParameter("speed", 0, 127, 50)
 
 """ for i in range(p.getNumJoints(sarge5_Id)):
@@ -236,7 +236,7 @@ while(1):
     pit = sarge_orn[0] - (np.pi/2.0)
     
     t = (int(time.perf_counter() * 100.0)) # current millis
-    print(f'{t}')
+    # print(f'{t}')
     
     if (t - t_start > time_control): # USE != and BLOCK t VARIABLE TO STOP MOTION
         t_start = t # reset previous time

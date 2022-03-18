@@ -12,7 +12,7 @@ import calc.leg as l
 import calc.rotate as r
 
 GRAVITY = -9.8
-# GRAVITY = 0
+GRAVITY = 0
 
 QB = math.pi / 4
 R0FL = 0.0
@@ -87,7 +87,7 @@ p.changeDynamics(block_down, -1, lateralFriction=2)
 
 # DEBUG PARAMETERS
 
-trailDuration = 5
+trailDuration = 3
 
 FL_Pose = [0, 0, 0]
 FL_prevPose = [0, 0, 0]
@@ -101,7 +101,7 @@ BR_Pose = [0, 0, 0]
 BR_prevPose = [0, 0, 0]
 BR_hasPrevPose = 0
 
-time_c = int(p.addUserDebugParameter("time", 5, 20, 10))
+time_c = int(p.addUserDebugParameter("time", 5, 50, 25))
 comMFB = p.addUserDebugParameter("speed", 0, 127, 50)
 
 """ for i in range(p.getNumJoints(sarge5_Id)):
@@ -146,7 +146,7 @@ def setDefaultBase():
     BLze = zb
 
 
-def setRotatedBase(pitch):
+def setRotatedBase(pitch = 0, alpha = 0):
     global FLxe, FLye, FLze, FRxe, FRye, FRze, BRxe, BRye, BRze, BLxe, BLye, BLze
     global xb, yb, zb
     # ROTATE TESTS
@@ -207,17 +207,17 @@ while(1):
     keys = p.getKeyboardEvents() 
     #Keys to change camera
     if keys.get(100):  #D
-        cyaw+=0.05
+        cyaw+=0.5
     if keys.get(97):   #A
-        cyaw-=0.05
+        cyaw-=0.5
     if keys.get(99):   #C
-        cpitch+=0.01
+        cpitch+=0.1
     if keys.get(102):  #F
-        cpitch-=0.01
+        cpitch-=0.1
     if keys.get(122):  #Z
-        cdist+=0.01
+        cdist+=0.05
     if keys.get(120):  #X
-        cdist-=0.01
+        cdist-=0.05
     """ MOVING SARGE 5 """
     if keys.get(p.B3G_UP_ARROW):
         running = 1 # forward
@@ -246,14 +246,14 @@ while(1):
             step += 1
             if step > 7:
                 step = 0
-            # print(step)
+            print(step)
             # print(f'{t}')
             filterData(pit)
 
             pit_pid = pid(variable_avg)
 
-            # setRotatedBase(-pit_pid)
-            setDefaultBase()
+            setRotatedBase(-pit_pid)
+            # setDefaultBase()
 
             # WRITE 
             # print(f'Avg Pitch: {(variable_avg*180.0)/np.pi} Unfiltered: {(pit*180.0)/np.pi}')
@@ -346,14 +346,14 @@ while(1):
                      BR_Leg.getQ0(), BR_Leg.getQ1(), BR_Leg.getQ2(),
                      BL_Leg.getQ0(), BL_Leg.getQ1(), BL_Leg.getQ2()]
 
-    FL_Pose = [FLye, FLze, FLxe]
-    FR_Pose = [-FRxe, FRye, FRze]
-    BR_Pose = [-BRxe, BRze, -BRye]
+    FL_Pose = r.rotate([FLxe, FLye, FLze + 1.7], 0, 0, -1.57079)
+    FR_Pose = r.rotate([-FRxe, FRye, FRze + 1.7], 0, 0, 1.57079)
+    # BR_Pose = r.rotate([-BRxe, BRye, BRze + 1.7], 0, 0, 1.57079)
 
     # DEBUG
-    # if (FL_hasPrevPose and FR_hasPrevPose):
-        # p.addUserDebugLine(FL_prevPose, FL_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
-        # p.addUserDebugLine(FR_prevPose, FR_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+    if (FL_hasPrevPose and FR_hasPrevPose):
+        p.addUserDebugLine(FL_prevPose, FL_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
+        p.addUserDebugLine(FR_prevPose, FR_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
         # p.addUserDebugLine(BR_prevPose, BR_Pose, [1, 0, 0], 1, trailDuration, sarge5_Id)
 
     FL_prevPose = FL_Pose
@@ -366,8 +366,9 @@ while(1):
     
     # print(jointPoses)
     ind = 0
-    for i in range(p.getNumJoints(sarge5_Id)): 
-        if (i - 3) % 4 != 0:
+    i = 1
+    for i in range(p.getNumJoints(sarge5_Id) - 1): 
+        if (i - 4) % 4 != 0:
             p.setJointMotorControl2(bodyIndex = sarge5_Id,
                                     jointIndex = i,
                                     controlMode = p.POSITION_CONTROL,

@@ -51,15 +51,6 @@ cdist=5
 sarge5_Id = p.loadURDF("../URDF/05-sarge5_v1.urdf",cubeStartPos, cubeStartOrientation)
 maxForce = 50
 
-step = 0
-
-# PID CONTROLLER
-Kp = 3.0
-Ki = 0.01
-Kd = 0.1
-
-pid = PID(Kp, Ki, Kd, setpoint=0.0)
-
 # LEG POSITIONS
 
 xb = 2.0 #starting x base position of the front left foot
@@ -103,33 +94,13 @@ BR_hasPrevPose = 0
 
 time_c = int(p.addUserDebugParameter("time", 5, 20, 10))
 comMFB = p.addUserDebugParameter("speed", 0, 127, 50)
-
-""" for i in range(p.getNumJoints(sarge5_Id)):
-    if (i - 3) % 4 != 0:
-        print(p.getJointInfo(sarge5_Id, i))
-        p.setJointMotorControl2(sarge5_Id, i, p.POSITION_CONTROL, targetPosition=0, force=maxForce) """
+rotation = p.addUserDebugParameter("Rotation (radians)", -1.57079, 1.57079, 0)
 
 p.changeDynamics(sarge5_Id,3,lateralFriction=2)
 p.changeDynamics(sarge5_Id,7,lateralFriction=2)
 p.changeDynamics(sarge5_Id,11,lateralFriction=2)
 p.changeDynamics(sarge5_Id,15,lateralFriction=2)
-
-
-# Defaults for first run
-last_variable = 0
-_alpha = 0.1
-def filterData(newData):
-    variable_sample = 0
-    global variable_avg, last_variable, _alpha
-    variable_avg = 0.0
-
-    variable_sample = newData
-
-    variable_avg = (variable_sample * _alpha) + ((last_variable) * (1-_alpha)) # calc variable average
-
-    last_variable = variable_avg
     
-
 def setDefaultBase():
     global FLxe, FLye, FLze, FRxe, FRye, FRze, BRxe, BRye, BRze, BLxe, BLye, BLze
     FLxe = xb
@@ -192,8 +163,6 @@ sarge_orn = 0
 
 f = open("matlab/output.txt", "w")
 
-t_true_start = int(time.perf_counter() * 100.0)
-t_start = int(time.perf_counter() * 100.0)
 running = False
 backwards = False
 while(1):
@@ -207,9 +176,9 @@ while(1):
     keys = p.getKeyboardEvents() 
     #Keys to change camera
     if keys.get(100):  #D
-        cyaw+=0.05
+        cyaw+=0.1
     if keys.get(97):   #A
-        cyaw-=0.05
+        cyaw-=0.1
     if keys.get(99):   #C
         cpitch+=0.01
     if keys.get(102):  #F
@@ -218,120 +187,13 @@ while(1):
         cdist+=0.01
     if keys.get(120):  #X
         cdist-=0.01
-    """ MOVING SARGE 5 """
-    if keys.get(p.B3G_UP_ARROW):
-        running = 1 # forward
-        backwards = 0 # stop backwards movement
-    if keys.get(115):  #S
-        running = 0 # stop
-        backwards = 0 # stop backwards movement
-    if keys.get(p.B3G_DOWN_ARROW):
-        backwards = 1
-    
-    
     
     time_control = int(p.readUserDebugParameter(time_c))
     # while (0):
-    sarge_orn = p.getEulerFromQuaternion(p.getBasePositionAndOrientation(sarge5_Id)[1])
-    pit = sarge_orn[0] - (np.pi/2.0)
-    
-    t = (int(time.perf_counter() * 100.0)) # current millis
-    # print(f'{t}')
-    
-    if (t - t_start > time_control): # USE != and BLOCK t VARIABLE TO STOP MOTION
-        t_start = t # reset previous time
-        if running or backwards: #if moving forward/back is true
-            
-            # add to step counter  
-            step += 1
-            if step > 7:
-                step = 0
-            # print(step)
-            # print(f'{t}')
-            filterData(pit)
+    # sarge_orn = p.getEulerFromQuaternion(p.getBasePositionAndOrientation(sarge5_Id)[1])
+    sarge_orn = p.readUserDebugParameter(rotation)
 
-            pit_pid = pid(variable_avg)
-
-            # setRotatedBase(-pit_pid)
-            setDefaultBase()
-
-            # WRITE 
-            # print(f'Avg Pitch: {(variable_avg*180.0)/np.pi} Unfiltered: {(pit*180.0)/np.pi}')
-
-            f.write('%f %f\n' % (t - t_true_start, (pit_pid*180.0)/np.pi))
-
-            comm_MFB = p.readUserDebugParameter(comMFB)
-            # floatMFB = commandMFB / 127.0
-            
-            floatMFB = comm_MFB / 127.0
-            
-            if backwards:
-                floatMFB *= -1.0
-
-            if step == 0:
-                # z movement
-                FLze = zb + zs
-                BRze = zb + zs
-
-            elif step == 1:
-                # z movement
-                FLze = zb + zs
-                BRze = zb + zs
-                
-                # x movement
-                FLxe = xb + ((floatMFB * xs)/4.0)
-                FRxe = xb - ((floatMFB * xs)/4.0)
-                BRxe = xb - ((floatMFB * xs)/4.0)
-                BLxe = xb + ((floatMFB * xs)/4.0)
-            elif step == 2:
-                # x movement
-                FLxe = xb + ((floatMFB * xs)/2.0)
-                FRxe = xb - ((floatMFB * xs)/2.0)
-                BRxe = xb - ((floatMFB * xs)/2.0)
-                BLxe = xb + ((floatMFB * xs)/2.0)
-            elif step == 3:
-                # z movement
-                FRze = zb + zs
-                BLze = zb + zs
-                
-                # x movement
-                FLxe = xb + ((floatMFB * xs)/4.0)
-                FRxe = xb - ((floatMFB * xs)/4.0)
-                BRxe = xb - ((floatMFB * xs)/4.0)
-                BLxe = xb + ((floatMFB * xs)/4.0)
-            elif step == 4:
-                # z movement
-                FRze = zb + zs
-                BLze = zb + zs
-
-            elif step == 5:
-                # z movement
-                FRze = zb + zs
-                BLze = zb + zs
-                
-                # x movement
-                FLxe = xb - ((floatMFB * xs)/4.0)
-                FRxe = xb + ((floatMFB * xs)/4.0)
-                BRxe = xb + ((floatMFB * xs)/4.0)
-                BLxe = xb - ((floatMFB * xs)/4.0)
-            elif step == 6:
-                # x movement
-                FLxe = xb - ((floatMFB * xs)/2.0)
-                FRxe = xb + ((floatMFB * xs)/2.0)
-                BRxe = xb + ((floatMFB * xs)/2.0)
-                BLxe = xb - ((floatMFB * xs)/2.0)
-            elif step == 7:
-                # z movement
-                FLze = zb + zs
-                BRze = zb + zs
-
-                # x movement
-                FLxe = xb - ((floatMFB * xs)/4.0)
-                FRxe = xb + ((floatMFB * xs)/4.0)
-                BRxe = xb + ((floatMFB * xs)/4.0)
-                BLxe = xb - ((floatMFB * xs)/4.0)
-        else:
-            setDefaultBase()
+    setRotatedBase(sarge_orn)
 
     FL_Leg.calcAngles(FLxe, FLye, FLze)
     FR_Leg.calcAngles(FRye, FRxe, FRze) # THIS HAS DIFFERENT COORDINATE SYSTEM
